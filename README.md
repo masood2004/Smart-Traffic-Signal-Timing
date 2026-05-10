@@ -235,7 +235,7 @@ A dynamic verdict is generated based on actual results.
 | Syed Masood Hussain | 22F-BSCS-26 |
 | Syed Tehmeed Jafar | 22F-BSCS-11 |
 | Zohair Raza | 22F-BSCS-29 |
-| Nikhil Kumar | 22F-BSCS-31 |
+| Nikhil Kumar | 22F-BSCS-30 |
 
 ---
 
