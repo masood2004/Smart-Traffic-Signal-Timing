@@ -13,12 +13,13 @@ from backend.pso.optimizer import PSOOptimizer
 from backend.sa.optimizer import SAOptimizer
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
+from backend.api.schemas import OptimizeConfig
 import json
 import io
 
 from backend.api.schemas import (
     SimulationConfig,
-    GAConfig,
+    OptimizeConfig,
     ComparisonConfig,
     ExportRequest,
 )
@@ -42,7 +43,7 @@ async def get_default_config():
     """Get default configuration parameters."""
     return {
         "simulation": SimulationConfig().model_dump(),
-        "ga": GAConfig().model_dump(),
+        "ga": OptimizeConfig().model_dump(),
         "comparison": ComparisonConfig().model_dump(),
     }
 
@@ -99,29 +100,63 @@ async def run_random_simulation(config: SimulationConfig):
 
 
 @router.post("/optimize")
-async def run_optimization(config: GAConfig):
-    """
-    Run the Genetic Algorithm optimization.
-
-    Returns the best chromosome, generation-by-generation history,
-    and timing plan for the optimal solution.
-    """
+async def run_optimization(config: OptimizeConfig):
     try:
-        optimizer = GAOptimizer(
-            grid_size=config.grid_size,
-            population_size=config.population_size,
-            generations=config.generations,
-            crossover_rate=config.crossover_rate,
-            mutation_rate=config.mutation_rate,
-            elite_count=config.elite_count,
-            tournament_size=config.tournament_size,
-            sim_steps=config.sim_steps,
-            spawn_rate=config.spawn_rate,
-        )
+        if config.algorithm == "PSO":
+            optimizer = PSOOptimizer(
+                grid_size=config.grid_size,
+                swarm_size=config.swarm_size,
+                iterations=config.pso_iterations,
+                sim_steps=config.sim_steps,
+                spawn_rate=config.spawn_rate
+            )
+        elif config.algorithm == "SA":
+            optimizer = SAOptimizer(
+                grid_size=config.grid_size,
+                initial_temp=config.sa_initial_temp,
+                iterations=config.sa_iterations,
+                sim_steps=config.sim_steps,
+                spawn_rate=config.spawn_rate
+            )
+        else:  # Default to GA
+            optimizer = GAOptimizer(
+                grid_size=config.grid_size,
+                population_size=config.population_size,
+                generations=config.generations,
+                crossover_rate=config.crossover_rate,
+                mutation_rate=config.mutation_rate,
+                elite_count=config.elite_count,
+                tournament_size=config.tournament_size,
+                sim_steps=config.sim_steps,
+                spawn_rate=config.spawn_rate,
+            )
 
         results = optimizer.run()
+
+# 🚨 NEW: Capture Snapshots for Simulator UI Visualization
+        if getattr(config, 'with_snapshots', False):
+            best_timing = results["best_chromosome"]["timing_plan"]
+            sim = TrafficSimulator(
+                grid_size=config.grid_size,
+                timing_plan=best_timing,
+                sim_steps=config.sim_steps,
+                spawn_rate=config.spawn_rate
+            )
+            # Record the grid state every X steps AND get complete metrics
+            snap_results = sim.run_with_snapshots(
+                snapshot_interval=getattr(config, 'snapshot_interval', 5))
+
+            # 🚨 FIX: GA was missing metrics. This overwrites the old metrics
+            # with the newly generated, 100% complete metrics from the final run.
+            full_metrics = {k: v for k,
+                            v in snap_results.items() if k != "snapshots"}
+            results["best_chromosome"]["metrics"] = full_metrics
+            results["best_chromosome"]["snapshots"] = snap_results["snapshots"]
+
         return results
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 

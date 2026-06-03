@@ -22,26 +22,33 @@ class SimulationConfig(BaseModel):
         default=10, ge=1, le=50, description="Snapshot interval")
 
 
-class GAConfig(BaseModel):
-    """Configuration for the Genetic Algorithm optimizer."""
-    grid_size: int = Field(default=4, ge=2, le=8,
-                           description="Grid size N for N×N grid")
-    population_size: int = Field(
-        default=30, ge=10, le=100, description="Population size")
-    generations: int = Field(default=50, ge=5, le=200,
-                             description="Number of generations")
-    crossover_rate: float = Field(
-        default=0.8, ge=0.1, le=1.0, description="Crossover rate")
-    mutation_rate: float = Field(
-        default=0.1, ge=0.01, le=0.5, description="Mutation rate")
-    elite_count: int = Field(default=2, ge=1, le=10,
-                             description="Number of elites")
-    tournament_size: int = Field(
-        default=3, ge=2, le=10, description="Tournament size")
-    sim_steps: int = Field(default=500, ge=100, le=2000,
-                           description="Simulation steps")
-    spawn_rate: float = Field(default=0.3, ge=0.05,
-                              le=0.8, description="Vehicle spawn rate")
+class OptimizeConfig(BaseModel):
+    """Configuration for the Optimization algorithms."""
+    algorithm: str = Field(
+        default="GA", description="Algorithm to run: GA, PSO, or SA")
+    grid_size: int = Field(default=4, ge=2, le=8)
+    sim_steps: int = Field(default=500, ge=100, le=2000)
+    spawn_rate: float = Field(default=0.3, ge=0.05, le=0.8)
+
+    # GA Specific
+    population_size: int = 30
+    generations: int = 50
+    crossover_rate: float = 0.8
+    mutation_rate: float = 0.1
+    elite_count: int = 2
+    tournament_size: int = 3
+
+    # PSO Specific
+    swarm_size: int = 30
+    pso_iterations: int = 50
+
+    # SA Specific
+    sa_initial_temp: float = 100.0
+    sa_iterations: int = 50
+
+    # 🚨 Simulator Visualization
+    with_snapshots: bool = False
+    snapshot_interval: int = 5
 
 
 class ComparisonConfig(BaseModel):
