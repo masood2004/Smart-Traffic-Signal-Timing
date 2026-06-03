@@ -1,1 +1,1 @@
-"""Utility functions for the traffic GA optimizer."""
+"""Utility functions for MetaTraffic AI comparative optimization."""

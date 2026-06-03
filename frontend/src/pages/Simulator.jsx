@@ -21,7 +21,7 @@ export default function Simulator() {
   });
 
   // UI State: Top tabs are the Algorithms. Options are Random/Fixed.
-  const [activeTab, setActiveTab] = useState("ga");
+  const [activeTab, setActiveTab] = useState(null);
   const [simMode, setSimMode] = useState("random");
   // Stores the randomized params used in last random run, to display them
   const [lastRandomConfig, setLastRandomConfig] = useState(null);
@@ -40,9 +40,14 @@ export default function Simulator() {
     setResults(null);
     setShowMetrics(false);
     setLastRandomConfig(null);
+    setError(null);
   };
 
   const handleRun = async () => {
+    if (!activeTab) {
+      setError("Select an algorithm to run.");
+      return;
+    }
     setLoading(true);
     setError(null);
     setResults(null);
@@ -213,8 +218,14 @@ export default function Simulator() {
                   fontSize: "0.85rem",
                 }}
               >
-                {activeTab.toUpperCase()} Simulation Mode:
+                {activeTab ? activeTab.toUpperCase() : "Algorithm"} Simulation
+                Mode:
               </label>
+              {!activeTab && (
+                <p style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>
+                  Select an algorithm to configure simulation parameters.
+                </p>
+              )}
               <div
                 className="mode-toggle"
                 style={{ display: "flex", gap: "0.5rem" }}
@@ -340,9 +351,13 @@ export default function Simulator() {
             <button
               className="btn btn-primary run-btn"
               onClick={handleRun}
-              disabled={loading}
+              disabled={loading || !activeTab}
             >
-              {loading ? "⏳ Computing..." : "▶ Run Simulation"}
+              {loading
+                ? "⏳ Computing..."
+                : activeTab
+                  ? "▶ Run Simulation"
+                  : "Select an Algorithm"}
             </button>
 
             {error && <div className="error-msg">⚠️ {error}</div>}

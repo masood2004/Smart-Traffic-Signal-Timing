@@ -1,10 +1,10 @@
 """
-API routes for the Traffic GA Optimizer backend.
+API routes for the MetaTraffic AI backend.
 
 Provides endpoints for:
 - Running traffic simulations
-- Running GA optimization
-- Comparing Fixed, Random, and GA timing strategies
+- Running GA/PSO/SA optimization
+- Comparing fixed baselines and optimized strategies
 - Exporting results
 - Getting default configuration
 """
@@ -35,7 +35,7 @@ router = APIRouter(prefix="/api")
 @router.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "ok", "service": "Traffic GA Optimizer"}
+    return {"status": "ok", "service": "MetaTraffic AI"}
 
 
 @router.get("/config")

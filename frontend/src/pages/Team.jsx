@@ -16,7 +16,7 @@ export default function Team() {
             👥 Our <span className="gradient-text">Team</span>
           </h1>
           <p>
-            The minds behind the Evolutionary Traffic Signal Optimization
+            The minds behind the comparative traffic signal optimization
             project.
           </p>
         </div>
@@ -53,8 +53,7 @@ export default function Team() {
           <div className="info-row">
             <span className="info-label">Project</span>
             <span className="info-value">
-              Evolutionary Optimization of Urban Traffic Signal Timing Using a
-              Genetic Algorithm
+              MetaTraffic AI | Comparative Optimization
             </span>
           </div>
         </div>

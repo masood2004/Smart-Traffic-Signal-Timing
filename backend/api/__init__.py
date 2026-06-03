@@ -1,1 +1,1 @@
-"""API module for the traffic GA optimizer backend."""
+"""API module for the MetaTraffic AI backend."""

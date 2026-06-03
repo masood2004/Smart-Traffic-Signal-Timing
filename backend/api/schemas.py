@@ -90,7 +90,7 @@ class SimulationResult(BaseModel):
 
 
 class GenerationResult(BaseModel):
-    """Result from one GA generation."""
+    """Result from one GA generation (when GA is selected)."""
     generation: int
     best_fitness: float
     avg_fitness: float
@@ -102,7 +102,7 @@ class GenerationResult(BaseModel):
 
 
 class GAResult(BaseModel):
-    """Complete GA optimization result."""
+    """GA optimization result (when GA is selected)."""
     best_chromosome: Dict[str, Any]
     history: List[Dict[str, Any]]
     total_time: float
@@ -110,12 +110,15 @@ class GAResult(BaseModel):
 
 
 class ComparisonResult(BaseModel):
-    """Result from baseline comparison."""
+    """Result from baseline and optimizer comparison."""
     fixed: Dict[str, Any]
-    random: Dict[str, Any]
     ga_optimized: Dict[str, Any]
+    pso_optimized: Dict[str, Any]
+    sa_optimized: Dict[str, Any]
     verdict: str
     ga_history: List[Dict[str, Any]]
+    pso_history: List[Dict[str, Any]]
+    sa_history: List[Dict[str, Any]]
 
 
 class ExportRequest(BaseModel):

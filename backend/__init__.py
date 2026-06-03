@@ -1,1 +1,1 @@
-"""Backend package for Traffic GA Optimizer."""
+"""Backend package for MetaTraffic AI comparative optimization."""

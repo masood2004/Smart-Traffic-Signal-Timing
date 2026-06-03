@@ -1,6 +1,6 @@
-# 🧬 Evolutionary Optimization of Urban Traffic Signal Timing
+# MetaTraffic AI | Comparative Optimization
 
-## Using a Genetic Algorithm
+## Multi-Algorithm Traffic Signal Timing (GA, PSO, SA)
 
 > **Course:** Evolutionary Computing  
 > **University:** Dawood University of Engineering & Technology  
@@ -15,7 +15,7 @@
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
 - [How to Run](#-how-to-run)
-- [Genetic Algorithm](#-genetic-algorithm)
+- [Optimization Algorithms](#-optimization-algorithms)
 - [Fitness Function](#-fitness-function)
 - [Comparison](#-comparison)
 - [Team Members](#-team-members)
@@ -24,7 +24,7 @@
 
 ## 🎯 Problem Statement
 
-Urban traffic congestion is a critical problem in modern cities. Traditional traffic signal timing systems use fixed-cycle approaches that cannot adapt to varying traffic conditions. This project addresses the problem of optimizing traffic signal green-light durations across an N×N grid of intersections using **Evolutionary Computing** techniques.
+Urban traffic congestion is a critical problem in modern cities. Traditional traffic signal timing systems use fixed-cycle approaches that cannot adapt to varying traffic conditions. This project addresses the problem of optimizing traffic signal green-light durations across an N×N grid of intersections using **comparative optimization** techniques.
 
 **Objective:** Find signal timing plans that:
 
@@ -35,23 +35,27 @@ Urban traffic congestion is a critical problem in modern cities. Traditional tra
 
 ---
 
-## 🧬 Methodology
+## 🧭 Methodology
 
-We employ a **Genetic Algorithm (GA)** to evolve optimal traffic signal timing plans:
+We employ a **comparative optimization pipeline** that evaluates GA, PSO, and SA under identical simulation conditions:
 
-1. **Initialize** a random population of timing plans (chromosomes)
-2. **Evaluate** each plan using a discrete-event traffic simulation
-3. **Select** parents via tournament selection
-4. **Crossover** parents using single-point crossover
-5. **Mutate** offspring genes for diversity
-6. **Preserve** the best individuals through elitism
-7. **Repeat** for N generations
+1. **Define** the simulation scenario (grid size, steps, spawn rate)
+2. **Select** an optimizer (GA, PSO, SA)
+3. **Search** timing plans using the chosen algorithm
+4. **Evaluate** each plan with the traffic simulator
+5. **Compare** results against baselines
+6. **Report** metrics, charts, and verdicts
 
-The GA is compared against two baselines:
+Baselines:
 
 - **Fixed Timing:** All signals use equal green durations
 - **Random Timing:** Each signal uses random green durations
-- **GA Optimized:** The best plan evolved by the Genetic Algorithm
+
+Optimizers:
+
+- **GA Optimized:** Best plan evolved by the Genetic Algorithm
+- **PSO Optimized:** Best plan found by swarm search
+- **SA Optimized:** Best plan found by annealing
 
 ---
 
@@ -172,27 +176,22 @@ cd frontend && npm run dev
 
 ---
 
-## 🧬 Genetic Algorithm
+## ⚙️ Optimization Algorithms
 
-### Chromosome Representation
+### Timing Plan Representation
 
-Each chromosome is a real-valued array of length `2 × N × N`, encoding green durations for both phases (NS and EW) at every intersection.
+Each timing plan is a real-valued array of length `2 × N × N`, encoding green durations for both phases (NS and EW) at every intersection.
 
 ```
-Gene structure: [NS₍₀,₀₎, EW₍₀,₀₎, NS₍₀,₁₎, EW₍₀,₁₎, ..., NS₍ₙ,ₙ₎, EW₍ₙ,ₙ₎]
-Gene bounds: 10 ≤ value ≤ 60 seconds
+Value structure: [NS₍₀,₀₎, EW₍₀,₀₎, NS₍₀,₁₎, EW₍₀,₁₎, ..., NS₍ₙ,ₙ₎, EW₍ₙ,ₙ₎]
+Value bounds: 10 ≤ duration ≤ 60 seconds
 ```
 
-### GA Operators
+### Algorithm Summaries
 
-| Operator    | Implementation                    |
-| ----------- | --------------------------------- |
-| Selection   | Tournament selection (k=3)        |
-| Crossover   | Single-point crossover (rate=0.8) |
-| Mutation    | Random reset mutation (rate=0.1)  |
-| Elitism     | Top-2 preservation                |
-| Population  | 30 individuals                    |
-| Generations | 50                                |
+- **GA:** Population-based evolutionary search using selection, crossover, mutation, and elitism.
+- **PSO:** Swarm-based optimization with inertia, cognitive, and social updates.
+- **SA:** Trajectory-based stochastic search with temperature-controlled acceptance.
 
 ---
 
@@ -215,11 +214,13 @@ Higher fitness = Better timing plan
 
 ## ⚖️ Comparison
 
-The project compares three strategies under identical simulation conditions:
+The project compares baselines and optimizers under identical simulation conditions:
 
 1. **Fixed Timing** — All signals use 30s green per phase
 2. **Random Timing** — Random durations ∈ [10, 60]s
 3. **GA Optimized** — Best evolved timing plan
+4. **PSO Optimized** — Best swarm-discovered timing plan
+5. **SA Optimized** — Best annealed timing plan
 
 Metrics compared:
 
@@ -250,5 +251,5 @@ This project is developed for academic purposes as part of the Evolutionary Comp
 ---
 
 <p align="center">
-  Built with 🧬 Python + React + Genetic Algorithms
+  Built with Python + React + Comparative Optimization
 </p>

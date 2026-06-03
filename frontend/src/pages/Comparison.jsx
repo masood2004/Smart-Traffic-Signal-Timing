@@ -118,8 +118,8 @@ export default function Comparison() {
             ⚖️ Baseline <span className="gradient-text">Comparison</span>
           </h1>
           <p>
-            Compare Fixed Timing, Random Timing, and GA Optimized timing
-            strategies side by side.
+            Compare fixed timing and optimized strategies (GA, PSO, SA) side by
+            side.
           </p>
         </div>
 
@@ -204,7 +204,7 @@ export default function Comparison() {
             style={{ marginTop: "var(--space-lg)" }}
           >
             {loading
-              ? "⏳ Running Comparison (Fixed → Random → GA)..."
+              ? "⏳ Running Comparison (Fixed → GA → PSO → SA)..."
               : "⚖️ Run Full Comparison"}
           </button>
           {error && <div className="error-msg">⚠️ {error}</div>}
@@ -214,10 +214,10 @@ export default function Comparison() {
           <div className="loading-overlay">
             <div className="spinner" />
             <p className="loading-text">
-              Running all three strategies for comparison...
+              Running fixed baseline and optimizers for comparison...
             </p>
             <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
-              This includes a full GA optimization run
+              This includes GA, PSO, and SA optimization runs
             </p>
           </div>
         )}
@@ -340,7 +340,7 @@ export default function Comparison() {
                 {fitnessEvolution && (
                   <ChartComponent
                     data={fitnessEvolution}
-                    title="GA Fitness Evolution"
+                    title="Optimizer Fitness Evolution"
                   />
                 )}
               </div>

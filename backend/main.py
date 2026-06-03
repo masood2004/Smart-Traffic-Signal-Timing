@@ -1,8 +1,8 @@
 """
-Traffic GA Optimizer — FastAPI Backend
+MetaTraffic AI | Comparative Optimization — FastAPI Backend
 
-Evolutionary Optimization of Urban Traffic Signal Timing
-Using a Genetic Algorithm.
+Comparative Optimization of Urban Traffic Signal Timing
+using GA, PSO, and SA.
 
 This is the main entry point for the backend server.
 Run with: python main.py
@@ -16,10 +16,10 @@ from backend.api.routes import router
 
 # Create FastAPI application
 app = FastAPI(
-    title="Traffic GA Optimizer API",
+    title="MetaTraffic AI | Comparative Optimization API",
     description=(
-        "Backend API for Evolutionary Optimization of Urban Traffic Signal Timing. "
-        "Provides endpoints for traffic simulation, Genetic Algorithm optimization, "
+        "Backend API for comparative optimization of urban traffic signal timing. "
+        "Provides endpoints for traffic simulation, GA/PSO/SA optimization, "
         "baseline comparison, and results export."
     ),
     version="1.0.0",
@@ -42,9 +42,9 @@ app.include_router(router)
 async def root():
     """Root endpoint with API info."""
     return {
-        "name": "Traffic GA Optimizer API",
+        "name": "MetaTraffic AI API",
         "version": "1.0.0",
-        "description": "Evolutionary Optimization of Urban Traffic Signal Timing",
+        "description": "Comparative Optimization of Urban Traffic Signal Timing",
         "docs": "/docs",
         "endpoints": {
             "health": "/api/health",

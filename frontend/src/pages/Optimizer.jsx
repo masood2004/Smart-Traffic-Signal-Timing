@@ -17,7 +17,7 @@ const ALGO_META = {
     btnText: "🧬 Run GA Optimization",
     busyText: "⏳ Evolving...",
     description:
-      "Configure and run the Genetic Algorithm to evolve optimal traffic signal timing plans.",
+      "Configure and run the Genetic Algorithm to search for high-quality traffic signal timing plans.",
     params: [
       {
         key: "population_size",
@@ -61,7 +61,7 @@ const ALGO_META = {
     btnText: "🐝 Run PSO Optimization",
     busyText: "⏳ Swarming...",
     description:
-      "Configure and run Particle Swarm Optimization to find optimal traffic signal timing plans.",
+      "Configure and run Particle Swarm Optimization to search for high-quality traffic signal timing plans.",
     params: [
       { key: "swarm_size", label: "Swarm Size", min: 5, max: 100, step: 5 },
       { key: "pso_iterations", label: "Iterations", min: 5, max: 200, step: 5 },
@@ -86,7 +86,7 @@ const ALGO_META = {
     btnText: "🔥 Run SA Optimization",
     busyText: "⏳ Annealing...",
     description:
-      "Configure and run Simulated Annealing to cool down toward the optimal traffic signal timing plan.",
+      "Configure and run Simulated Annealing to search for high-quality traffic signal timing plans.",
     params: [
       {
         key: "sa_initial_temp",
@@ -147,13 +147,13 @@ const DEFAULT_CONFIG = {
 };
 
 export default function Optimizer() {
-  const [activeTab, setActiveTab] = useState("ga");
+  const [activeTab, setActiveTab] = useState(null);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const meta = ALGO_META[activeTab];
+  const meta = activeTab ? ALGO_META[activeTab] : null;
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -162,6 +162,10 @@ export default function Optimizer() {
   };
 
   const handleOptimize = async () => {
+    if (!activeTab) {
+      setError("Select an algorithm to run.");
+      return;
+    }
     setLoading(true);
     setError(null);
     setResults(null);
@@ -182,90 +186,113 @@ export default function Optimizer() {
   const best = results?.best_chromosome;
 
   // Chart x-axis labels adapt to the algorithm's iteration terminology
-  const xLabels = history.map(
-    (h) => `${meta.iterLabel} ${h.generation ?? h.iteration ?? ""}`,
-  );
+  const xLabels = meta
+    ? history.map(
+        (h) => `${meta.iterLabel} ${h.generation ?? h.iteration ?? ""}`,
+      )
+    : [];
 
-  const fitnessData = {
-    labels: xLabels,
-    datasets: [
-      {
-        label: "Best Fitness",
-        data: history.map((h) => h.best_fitness),
-        borderColor: meta.color,
-        backgroundColor: meta.color + "1a",
-        fill: true,
-        tension: 0.4,
-      },
-      {
-        label: "Avg Fitness",
-        data: history.map((h) => h.avg_fitness),
-        borderColor: "#7b2ff7",
-        backgroundColor: "rgba(123,47,247,0.1)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  };
+  const fitnessData = meta
+    ? {
+        labels: xLabels,
+        datasets: [
+          {
+            label: "Best Fitness",
+            data: history.map((h) => h.best_fitness),
+            borderColor: meta.color,
+            backgroundColor: meta.color + "1a",
+            fill: true,
+            tension: 0.4,
+          },
+          {
+            label: "Avg Fitness",
+            data: history.map((h) => h.avg_fitness),
+            borderColor: "#7b2ff7",
+            backgroundColor: "rgba(123,47,247,0.1)",
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      }
+    : null;
 
-  const throughputData = {
-    labels: xLabels,
-    datasets: [
-      {
-        label: "Throughput",
-        data: history.map((h) => h.best_metrics?.throughput || 0),
-        borderColor: "#00ff88",
-        backgroundColor: "rgba(0,255,136,0.1)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  };
+  const throughputData = meta
+    ? {
+        labels: xLabels,
+        datasets: [
+          {
+            label: "Throughput",
+            data: history.map((h) => h.best_metrics?.throughput || 0),
+            borderColor: "#00ff88",
+            backgroundColor: "rgba(0,255,136,0.1)",
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      }
+    : null;
 
-  const waitingData = {
-    labels: xLabels,
-    datasets: [
-      {
-        label: "Avg Waiting Time",
-        data: history.map((h) => h.best_metrics?.avg_waiting_time || 0),
-        borderColor: "#ffa726",
-        backgroundColor: "rgba(255,167,38,0.1)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  };
+  const waitingData = meta
+    ? {
+        labels: xLabels,
+        datasets: [
+          {
+            label: "Avg Waiting Time",
+            data: history.map((h) => h.best_metrics?.avg_waiting_time || 0),
+            borderColor: "#ffa726",
+            backgroundColor: "rgba(255,167,38,0.1)",
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      }
+    : null;
 
-  const gridlockData = {
-    labels: xLabels,
-    datasets: [
-      {
-        label: "Gridlock Penalty",
-        data: history.map((h) => h.best_metrics?.gridlock_penalty || 0),
-        borderColor: "#ff4757",
-        backgroundColor: "rgba(255,71,87,0.1)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  };
+  const gridlockData = meta
+    ? {
+        labels: xLabels,
+        datasets: [
+          {
+            label: "Gridlock Penalty",
+            data: history.map((h) => h.best_metrics?.gridlock_penalty || 0),
+            borderColor: "#ff4757",
+            backgroundColor: "rgba(255,71,87,0.1)",
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      }
+    : null;
 
   // Loading hint line differs per algorithm
-  const loadingHint = {
-    ga: `Population: ${config.population_size} × Generations: ${config.generations}`,
-    pso: `Swarm: ${config.swarm_size} × Iterations: ${config.pso_iterations}`,
-    sa: `Temp: ${config.sa_initial_temp} → Cooling: ${config.sa_cooling_rate} × Iterations: ${config.sa_iterations}`,
-  }[activeTab];
+  const loadingHint = meta
+    ? {
+        ga: `Population: ${config.population_size} × Generations: ${config.generations}`,
+        pso: `Swarm: ${config.swarm_size} × Iterations: ${config.pso_iterations}`,
+        sa: `Temp: ${config.sa_initial_temp} → Cooling: ${config.sa_cooling_rate} × Iterations: ${config.sa_iterations}`,
+      }[activeTab]
+    : null;
 
   return (
     <div className="optimizer-page page-container">
       <div className="container">
         <div className="page-header animate-fade-in">
-          <h1>
-            {meta.emoji} <span className="gradient-text">{meta.name}</span>{" "}
-            Optimizer
-          </h1>
-          <p>{meta.description}</p>
+          {meta ? (
+            <>
+              <h1>
+                {meta.emoji} <span className="gradient-text">{meta.name}</span>{" "}
+                Optimizer
+              </h1>
+              <p>{meta.description}</p>
+            </>
+          ) : (
+            <>
+              <h1>
+                ⚙️ <span className="gradient-text">Optimizer</span>
+              </h1>
+              <p>Select an algorithm to configure and run optimization.</p>
+            </>
+          )}
         </div>
 
         <div className="opt-layout">
@@ -342,47 +369,62 @@ export default function Optimizer() {
             </div>
 
             {/* Algorithm-specific params */}
-            <p
-              style={{
-                fontSize: "0.75rem",
-                color: "var(--text-muted)",
-                marginBottom: "0.5rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-              }}
-            >
-              {meta.label} Parameters
-            </p>
-            <div className="config-grid">
-              {meta.params.map((param) => (
-                <div key={param.key} className="input-group">
-                  <label>{param.label}</label>
-                  <div className="range-row">
-                    <input
-                      type="range"
-                      min={param.min}
-                      max={param.max}
-                      step={param.step}
-                      value={config[param.key] ?? param.min}
-                      onChange={(e) =>
-                        setConfig({ ...config, [param.key]: +e.target.value })
-                      }
-                    />
-                    <span className="range-value">
-                      {config[param.key] ?? param.min}
-                    </span>
-                  </div>
+            {meta ? (
+              <>
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--text-muted)",
+                    marginBottom: "0.5rem",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {meta.label} Parameters
+                </p>
+                <div className="config-grid">
+                  {meta.params.map((param) => (
+                    <div key={param.key} className="input-group">
+                      <label>{param.label}</label>
+                      <div className="range-row">
+                        <input
+                          type="range"
+                          min={param.min}
+                          max={param.max}
+                          step={param.step}
+                          value={config[param.key] ?? param.min}
+                          onChange={(e) =>
+                            setConfig({
+                              ...config,
+                              [param.key]: +e.target.value,
+                            })
+                          }
+                        />
+                        <span className="range-value">
+                          {config[param.key] ?? param.min}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            ) : (
+              <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
+                Select an algorithm to view its parameters.
+              </p>
+            )}
 
             <button
               className="btn btn-primary run-btn"
               onClick={handleOptimize}
-              disabled={loading}
-              style={{ marginTop: "1.25rem", borderColor: meta.color }}
+              disabled={loading || !meta}
+              style={{ marginTop: "1.25rem", borderColor: meta?.color }}
             >
-              {loading ? meta.busyText : meta.btnText}
+              {loading
+                ? meta?.busyText
+                : meta
+                  ? meta.btnText
+                  : "Select an Algorithm"}
             </button>
 
             {error && <div className="error-msg">⚠️ {error}</div>}
@@ -398,7 +440,7 @@ export default function Optimizer() {
 
           {/* ── Results Panel ─────────────────────────────────────────────── */}
           <div className="opt-results">
-            {loading && (
+            {loading && meta && (
               <div className="opt-loading glass-card">
                 <div className="spinner" />
                 <p className="loading-text">{meta.loadingText}</p>
@@ -408,7 +450,7 @@ export default function Optimizer() {
               </div>
             )}
 
-            {best && (
+            {best && meta && (
               <>
                 <div className="grid-4 animate-fade-in">
                   <MetricsCard
@@ -439,22 +481,30 @@ export default function Optimizer() {
                 </div>
 
                 <div className="charts-grid animate-slide-up">
-                  <ChartComponent
-                    data={fitnessData}
-                    title={`Fitness Over ${meta.iterLabel === "Gen" ? "Generations" : "Iterations"}`}
-                  />
-                  <ChartComponent
-                    data={throughputData}
-                    title={`Throughput Over ${meta.iterLabel === "Gen" ? "Generations" : "Iterations"}`}
-                  />
-                  <ChartComponent
-                    data={waitingData}
-                    title={`Waiting Time Over ${meta.iterLabel === "Gen" ? "Generations" : "Iterations"}`}
-                  />
-                  <ChartComponent
-                    data={gridlockData}
-                    title={`Gridlock Penalty Over ${meta.iterLabel === "Gen" ? "Generations" : "Iterations"}`}
-                  />
+                  {fitnessData && (
+                    <ChartComponent
+                      data={fitnessData}
+                      title={`Fitness Over ${meta.iterLabel === "Gen" ? "Generations" : "Iterations"}`}
+                    />
+                  )}
+                  {throughputData && (
+                    <ChartComponent
+                      data={throughputData}
+                      title={`Throughput Over ${meta.iterLabel === "Gen" ? "Generations" : "Iterations"}`}
+                    />
+                  )}
+                  {waitingData && (
+                    <ChartComponent
+                      data={waitingData}
+                      title={`Waiting Time Over ${meta.iterLabel === "Gen" ? "Generations" : "Iterations"}`}
+                    />
+                  )}
+                  {gridlockData && (
+                    <ChartComponent
+                      data={gridlockData}
+                      title={`Gridlock Penalty Over ${meta.iterLabel === "Gen" ? "Generations" : "Iterations"}`}
+                    />
+                  )}
                 </div>
 
                 <div className="best-plan glass-card animate-fade-in">
