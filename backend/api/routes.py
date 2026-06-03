@@ -8,7 +8,9 @@ Provides endpoints for:
 - Exporting results
 - Getting default configuration
 """
-
+import traceback
+from backend.pso.optimizer import PSOOptimizer
+from backend.sa.optimizer import SAOptimizer
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
 import json
@@ -49,7 +51,7 @@ async def get_default_config():
 async def run_simulation(config: SimulationConfig):
     """
     Run a traffic simulation with fixed timing.
-    
+
     Returns simulation results including throughput, waiting time,
     queue length, and gridlock metrics.
     """
@@ -100,7 +102,7 @@ async def run_random_simulation(config: SimulationConfig):
 async def run_optimization(config: GAConfig):
     """
     Run the Genetic Algorithm optimization.
-    
+
     Returns the best chromosome, generation-by-generation history,
     and timing plan for the optimal solution.
     """
@@ -116,7 +118,7 @@ async def run_optimization(config: GAConfig):
             sim_steps=config.sim_steps,
             spawn_rate=config.spawn_rate,
         )
-        
+
         results = optimizer.run()
         return results
     except Exception as e:
@@ -125,12 +127,6 @@ async def run_optimization(config: GAConfig):
 
 @router.post("/compare")
 async def run_comparison(config: ComparisonConfig):
-    """
-    Run all three timing strategies and compare results.
-    
-    Runs Fixed Timing, Random Timing, and GA Optimized timing
-    with the same simulation parameters, then generates a verdict.
-    """
     try:
         # 1. Fixed timing baseline
         fixed_results = run_fixed_timing(
@@ -140,15 +136,8 @@ async def run_comparison(config: ComparisonConfig):
             spawn_rate=config.spawn_rate,
         )
 
-        # 2. Random timing baseline
-        random_results = run_random_timing(
-            grid_size=config.grid_size,
-            sim_steps=config.sim_steps,
-            spawn_rate=config.spawn_rate,
-        )
-
-        # 3. GA Optimized timing
-        optimizer = GAOptimizer(
+        # 2. GA Optimized timing
+        ga_opt = GAOptimizer(
             grid_size=config.grid_size,
             population_size=config.ga_population_size,
             generations=config.ga_generations,
@@ -157,35 +146,49 @@ async def run_comparison(config: ComparisonConfig):
             sim_steps=config.sim_steps,
             spawn_rate=config.spawn_rate,
         )
-        ga_results = optimizer.run()
-        
-        # Get GA optimized simulation metrics
-        ga_best = ga_results["best_chromosome"]
-        ga_metrics = ga_best["metrics"]
-        ga_metrics["strategy"] = "GA Optimized"
-        ga_metrics["description"] = "Best timing plan found by Genetic Algorithm"
-        ga_metrics["timing_plan"] = ga_best["timing_plan"]
-        ga_metrics["throughput"] = ga_metrics.get("throughput", 0)
-        ga_metrics["total_spawned"] = fixed_results.get("total_spawned", 0)
-        ga_metrics["max_queue_length"] = int(ga_metrics.get("avg_queue_length", 0) * 2)
-        ga_metrics["total_gridlock_events"] = int(ga_metrics.get("gridlock_penalty", 0))
-        ga_metrics["completion_rate"] = round(
-            ga_metrics["throughput"] / max(ga_metrics.get("total_spawned", 1), 1) * 100, 2
-        )
-        ga_metrics["vehicles_remaining"] = 0
+        ga_results = ga_opt.run()
+        ga_best = ga_results["best_chromosome"]["metrics"]
+        ga_best["strategy"] = "GA Optimized"
 
-        # Generate dynamic verdict
-        verdict = generate_verdict(fixed_results, random_results, ga_metrics)
+        # 3. PSO Optimized timing
+        pso_opt = PSOOptimizer(
+            grid_size=config.grid_size,
+            swarm_size=config.pso_swarm_size,
+            iterations=config.pso_iterations,
+            sim_steps=config.sim_steps,
+            spawn_rate=config.spawn_rate
+        )
+        pso_results = pso_opt.run()
+        pso_best = pso_results["best_chromosome"]["metrics"]
+        pso_best["strategy"] = "PSO Optimized"
+
+        # 4. SA Optimized timing
+        sa_opt = SAOptimizer(
+            grid_size=config.grid_size,
+            initial_temp=config.sa_initial_temp,
+            iterations=config.sa_iterations,
+            sim_steps=config.sim_steps,
+            spawn_rate=config.spawn_rate
+        )
+        sa_results = sa_opt.run()
+        sa_best = sa_results["best_chromosome"]["metrics"]
+        sa_best["strategy"] = "SA Optimized"
+
+        verdict = "Comparison complete. Check the metrics above to see which algorithm performed best."
 
         return {
             "fixed": fixed_results,
-            "random": random_results,
-            "ga_optimized": ga_metrics,
+            "ga_optimized": ga_best,
+            "pso_optimized": pso_best,
+            "sa_optimized": sa_best,
             "verdict": verdict,
             "ga_history": ga_results["history"],
-            "ga_config": ga_results["config"],
+            "pso_history": pso_results["history"],
+            "sa_history": sa_results["history"],
         }
     except Exception as e:
+        # This will print the exact line and error to your terminal!
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -198,14 +201,16 @@ async def export_results(request: ExportRequest):
             return StreamingResponse(
                 io.BytesIO(csv_content.encode()),
                 media_type="text/csv",
-                headers={"Content-Disposition": "attachment; filename=results.csv"},
+                headers={
+                    "Content-Disposition": "attachment; filename=results.csv"},
             )
         else:
             json_content = export_to_json(request.data)
             return StreamingResponse(
                 io.BytesIO(json_content.encode()),
                 media_type="application/json",
-                headers={"Content-Disposition": "attachment; filename=results.json"},
+                headers={
+                    "Content-Disposition": "attachment; filename=results.json"},
             )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

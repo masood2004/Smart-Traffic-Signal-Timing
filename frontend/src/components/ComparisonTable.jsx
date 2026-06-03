@@ -1,69 +1,104 @@
-import './ComparisonTable.css';
+import React from "react";
+import "./ComparisonTable.css";
 
-export default function ComparisonTable({ fixed, random, gaOptimized }) {
-  if (!fixed || !random || !gaOptimized) return null;
-
-  const metrics = [
-    { key: 'throughput', label: 'Throughput (vehicles)', icon: '🚗', better: 'higher' },
-    { key: 'avg_waiting_time', label: 'Avg Waiting Time (s)', icon: '⏱️', better: 'lower' },
-    { key: 'avg_queue_length', label: 'Avg Queue Length', icon: '📊', better: 'lower' },
-    { key: 'gridlock_penalty', label: 'Gridlock Penalty', icon: '🚫', better: 'lower' },
-    { key: 'completion_rate', label: 'Completion Rate (%)', icon: '✅', better: 'higher' },
-  ];
-
-  const getBestClass = (metric, values) => {
-    const isHigherBetter = metric.better === 'higher';
-    const best = isHigherBetter ? Math.max(...values) : Math.min(...values);
-    return values.map((v) => v === best ? 'best-value' : '');
-  };
+export default function ComparisonTable({ fixed, ga, pso, sa }) {
+  if (!fixed || !ga || !pso || !sa) return null;
 
   return (
-    <div className="comparison-table-wrapper">
+    <div className="table-wrapper">
       <table className="comparison-table">
         <thead>
           <tr>
-            <th className="metric-col">Metric</th>
-            <th className="strategy-col fixed-col">
-              <span className="strategy-dot" style={{ background: '#ffa726' }} />
-              Fixed Timing
-            </th>
-            <th className="strategy-col random-col">
-              <span className="strategy-dot" style={{ background: '#ff4757' }} />
-              Random Timing
-            </th>
-            <th className="strategy-col ga-col">
-              <span className="strategy-dot" style={{ background: '#00ff88' }} />
-              GA Optimized
-            </th>
+            <th>Metric</th>
+            <th>Fixed Baseline</th>
+            <th>GA Optimized</th>
+            <th>PSO Optimized</th>
+            <th>SA Optimized</th>
           </tr>
         </thead>
         <tbody>
-          {metrics.map((metric) => {
-            const vals = [
-              fixed[metric.key] ?? 0,
-              random[metric.key] ?? 0,
-              gaOptimized[metric.key] ?? 0,
-            ];
-            const classes = getBestClass(metric, vals);
-
-            return (
-              <tr key={metric.key}>
-                <td className="metric-name">
-                  <span className="metric-icon">{metric.icon}</span>
-                  {metric.label}
-                </td>
-                <td className={classes[0]}>
-                  {typeof vals[0] === 'number' ? vals[0].toLocaleString(undefined, { maximumFractionDigits: 2 }) : vals[0]}
-                </td>
-                <td className={classes[1]}>
-                  {typeof vals[1] === 'number' ? vals[1].toLocaleString(undefined, { maximumFractionDigits: 2 }) : vals[1]}
-                </td>
-                <td className={classes[2]}>
-                  {typeof vals[2] === 'number' ? vals[2].toLocaleString(undefined, { maximumFractionDigits: 2 }) : vals[2]}
-                </td>
-              </tr>
-            );
-          })}
+          <tr>
+            <td>Throughput (Vehicles completed)</td>
+            <td>{fixed.throughput}</td>
+            <td
+              className={
+                ga.throughput >= pso.throughput &&
+                ga.throughput >= sa.throughput
+                  ? "highlight-good"
+                  : ""
+              }
+            >
+              {ga.throughput}
+            </td>
+            <td
+              className={
+                pso.throughput >= ga.throughput &&
+                pso.throughput >= sa.throughput
+                  ? "highlight-good"
+                  : ""
+              }
+            >
+              {pso.throughput}
+            </td>
+            <td
+              className={
+                sa.throughput >= ga.throughput &&
+                sa.throughput >= pso.throughput
+                  ? "highlight-good"
+                  : ""
+              }
+            >
+              {sa.throughput}
+            </td>
+          </tr>
+          <tr>
+            <td>Average Wait Time (Seconds)</td>
+            <td>{fixed.avg_waiting_time}</td>
+            <td
+              className={
+                ga.avg_waiting_time <= pso.avg_waiting_time &&
+                ga.avg_waiting_time <= sa.avg_waiting_time
+                  ? "highlight-good"
+                  : ""
+              }
+            >
+              {ga.avg_waiting_time}
+            </td>
+            <td
+              className={
+                pso.avg_waiting_time <= ga.avg_waiting_time &&
+                pso.avg_waiting_time <= sa.avg_waiting_time
+                  ? "highlight-good"
+                  : ""
+              }
+            >
+              {pso.avg_waiting_time}
+            </td>
+            <td
+              className={
+                sa.avg_waiting_time <= ga.avg_waiting_time &&
+                sa.avg_waiting_time <= pso.avg_waiting_time
+                  ? "highlight-good"
+                  : ""
+              }
+            >
+              {sa.avg_waiting_time}
+            </td>
+          </tr>
+          <tr>
+            <td>Max Queue Length</td>
+            <td>{fixed.max_queue_length}</td>
+            <td>{ga.max_queue_length}</td>
+            <td>{pso.max_queue_length}</td>
+            <td>{sa.max_queue_length}</td>
+          </tr>
+          <tr>
+            <td>Gridlock Penalty</td>
+            <td>{fixed.gridlock_penalty}</td>
+            <td>{ga.gridlock_penalty}</td>
+            <td>{pso.gridlock_penalty}</td>
+            <td>{sa.gridlock_penalty}</td>
+          </tr>
         </tbody>
       </table>
     </div>

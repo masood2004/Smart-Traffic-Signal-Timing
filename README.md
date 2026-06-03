@@ -27,6 +27,7 @@
 Urban traffic congestion is a critical problem in modern cities. Traditional traffic signal timing systems use fixed-cycle approaches that cannot adapt to varying traffic conditions. This project addresses the problem of optimizing traffic signal green-light durations across an N×N grid of intersections using **Evolutionary Computing** techniques.
 
 **Objective:** Find signal timing plans that:
+
 - ✅ Maximize vehicle throughput
 - ✅ Minimize average waiting time
 - ✅ Reduce queue lengths
@@ -47,6 +48,7 @@ We employ a **Genetic Algorithm (GA)** to evolve optimal traffic signal timing p
 7. **Repeat** for N generations
 
 The GA is compared against two baselines:
+
 - **Fixed Timing:** All signals use equal green durations
 - **Random Timing:** Each signal uses random green durations
 - **GA Optimized:** The best plan evolved by the Genetic Algorithm
@@ -55,15 +57,15 @@ The GA is compared against two baselines:
 
 ## 🛠 Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Algorithm | Python (NumPy) |
-| Backend API | FastAPI + Uvicorn |
-| Frontend | React 18 + Vite |
-| Charts | Chart.js + react-chartjs-2 |
-| Styling | Vanilla CSS (Glassmorphism + Dark Theme) |
-| Visualization | HTML5 Canvas |
-| Routing | React Router v6 |
+| Layer         | Technology                               |
+| ------------- | ---------------------------------------- |
+| Algorithm     | Python (NumPy)                           |
+| Backend API   | FastAPI + Uvicorn                        |
+| Frontend      | React 18 + Vite                          |
+| Charts        | Chart.js + react-chartjs-2               |
+| Styling       | Vanilla CSS (Glassmorphism + Dark Theme) |
+| Visualization | HTML5 Canvas                             |
+| Routing       | React Router v6                          |
 
 ---
 
@@ -129,6 +131,7 @@ Smart-Traffic-Signal-Timing/
 ## 🚀 How to Run
 
 ### Prerequisites
+
 - Python 3.9+
 - Node.js 18+
 - npm
@@ -158,6 +161,7 @@ The UI will start at `http://localhost:5173`
 ### Both Together
 
 Open two terminals:
+
 ```bash
 # Terminal 1 — Backend
 python -m backend.main
@@ -171,6 +175,7 @@ cd frontend && npm run dev
 ## 🧬 Genetic Algorithm
 
 ### Chromosome Representation
+
 Each chromosome is a real-valued array of length `2 × N × N`, encoding green durations for both phases (NS and EW) at every intersection.
 
 ```
@@ -180,14 +185,14 @@ Gene bounds: 10 ≤ value ≤ 60 seconds
 
 ### GA Operators
 
-| Operator | Implementation |
-|----------|---------------|
-| Selection | Tournament selection (k=3) |
-| Crossover | Single-point crossover (rate=0.8) |
-| Mutation | Random reset mutation (rate=0.1) |
-| Elitism | Top-2 preservation |
-| Population | 30 individuals |
-| Generations | 50 |
+| Operator    | Implementation                    |
+| ----------- | --------------------------------- |
+| Selection   | Tournament selection (k=3)        |
+| Crossover   | Single-point crossover (rate=0.8) |
+| Mutation    | Random reset mutation (rate=0.1)  |
+| Elitism     | Top-2 preservation                |
+| Population  | 30 individuals                    |
+| Generations | 50                                |
 
 ---
 
@@ -197,12 +202,12 @@ Gene bounds: 10 ≤ value ≤ 60 seconds
 Fitness = w₁ × Throughput − w₂ × AvgWaitingTime − w₃ × AvgQueueLength − w₄ × GridlockPenalty
 ```
 
-| Weight | Value | Objective |
-|--------|-------|-----------|
-| w₁ (Throughput) | 2.0 | Maximize |
-| w₂ (Waiting Time) | 1.0 | Minimize |
-| w₃ (Queue Length) | 0.5 | Minimize |
-| w₄ (Gridlock) | 3.0 | Minimize |
+| Weight            | Value | Objective |
+| ----------------- | ----- | --------- |
+| w₁ (Throughput)   | 2.0   | Maximize  |
+| w₂ (Waiting Time) | 1.0   | Minimize  |
+| w₃ (Queue Length) | 0.5   | Minimize  |
+| w₄ (Gridlock)     | 3.0   | Minimize  |
 
 Higher fitness = Better timing plan
 
@@ -217,6 +222,7 @@ The project compares three strategies under identical simulation conditions:
 3. **GA Optimized** — Best evolved timing plan
 
 Metrics compared:
+
 - Throughput (vehicles completed)
 - Average waiting time
 - Average queue length
@@ -229,13 +235,11 @@ A dynamic verdict is generated based on actual results.
 
 ## 👥 Team Members
 
-| Name | Roll Number |
-|------|-------------|
-| Muhammad Fasih | 22F-BSCS-19 |
+| Name                | Roll Number |
+| ------------------- | ----------- |
+| Muhammad Fasih      | 22F-BSCS-19 |
 | Syed Masood Hussain | 22F-BSCS-26 |
-| Syed Tehmeed Jafar | 22F-BSCS-11 |
-| Zohair Raza | 22F-BSCS-29 |
-| Nikhil Kumar | 22F-BSCS-30 |
+| Syed Tehmeed Jafar  | 22F-BSCS-11 |
 
 ---
 
