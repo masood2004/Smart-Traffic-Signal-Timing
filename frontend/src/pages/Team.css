@@ -1,8 +1,11 @@
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-xl);
   margin-bottom: var(--space-3xl);
+
+  max-width: 1100px;
+  margin: 0 auto var(--space-3xl) auto;
 }
 
 .team-info {
