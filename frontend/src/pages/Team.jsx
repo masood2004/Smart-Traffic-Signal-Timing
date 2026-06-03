@@ -48,7 +48,7 @@ export default function Team() {
           </div>
           <div className="info-row">
             <span className="info-label">Semester</span>
-            <span className="info-value">Fall 2022</span>
+            <span className="info-value">8th (2026)</span>
           </div>
           <div className="info-row">
             <span className="info-label">Project</span>
