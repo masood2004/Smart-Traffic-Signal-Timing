@@ -86,3 +86,40 @@
     grid-template-columns: 1fr;
   }
 }
+/* ── Print Media Query for PDF Download ────────────────────────────── */
+@media print {
+  /* PDF mein Download button, Nav bar aur Footer hide kar dein */
+  .print-btn, 
+  nav, 
+  footer, 
+  .dashboard-empty {
+    display: none !important;
+  }
+
+  /* Background colors aur dark theme cards ko PDF me show karne ke liye */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page ka margin set karein */
+  @page {
+    margin: 1cm;
+    size: auto;
+  }
+
+  /* Charts aur Cards ko 2 pages ke darmiyan break hone se bachayen */
+  .dash-section, 
+  .glass-card, 
+  canvas {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Layout thora adjust karein taake PDF A4 size par theek lagay */
+  .dashboard-page {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+}
