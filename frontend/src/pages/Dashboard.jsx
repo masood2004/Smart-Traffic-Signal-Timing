@@ -111,14 +111,44 @@ export default function Dashboard() {
     <div className="dashboard-page page-container">
       <div className="container">
         {/* ── Header ─────────────────────────────────────────────────────── */}
-        <div className="page-header animate-fade-in">
-          <h1>
-            📊 Results <span className="gradient-text">Dashboard</span>
-          </h1>
-          <p>
-            Comprehensive view of optimization results — metrics, convergence
-            charts, and best timing plans across all three algorithms.
-          </p>
+        <div 
+          className="page-header animate-fade-in" 
+          style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}
+        >
+          <div style={{ flex: 1 }}>
+            <h1>
+              📊 Results <span className="gradient-text">Dashboard</span>
+            </h1>
+            <p>
+              Comprehensive view of optimization results — metrics, convergence
+              charts, and best timing plans across all three algorithms.
+            </p>
+          </div>
+          
+          {/* Download PDF Button - Only shows when there are results */}
+          {results && (
+            <button 
+              className="btn print-btn" 
+              onClick={() => window.print()}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.6rem 1.2rem",
+                background: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                color: "white",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontWeight: "bold",
+                transition: "all 0.2s"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)"}
+              onMouseOut={(e) => e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"}
+            >
+              📥 Download PDF
+            </button>
+          )}
         </div>
 
         {/* ── Empty / selector state ──────────────────────────────────────── */}
